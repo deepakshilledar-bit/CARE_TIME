@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CareTime | Smart Medicine Reminder</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#"><span class="brand-icon">✚</span> CareTime</a>
+    <div class="top-actions"><span id="todayLabel"></span><button id="logoutBtn" class="button ghost hidden">Log out</button></div>
+  </header>
+
+  <main>
+    <section id="authView" class="auth-layout">
+      <div class="welcome-panel">
+        <div class="pill">YOUR HEALTH, ON TIME</div>
+        <h1>A little reminder.<br><span>A lot of care.</span></h1>
+        <p>Keep prescriptions, medicine photos, schedules, and caregiver details together in one simple dashboard.</p>
+        <div class="welcome-points"><span>✓ Personal medicine schedule</span><span>✓ Timely browser alarms</span><span>✓ Guardian alert workflow</span></div>
+      </div>
+      <div class="auth-card">
+        <div class="tabs"><button class="tab active" data-tab="login">Login</button><button class="tab" data-tab="register">Create account</button></div>
+        <h2 id="authTitle">Welcome back</h2>
+        <p class="muted">Use a demo account on this device.</p>
+        <form id="authForm">
+          <label for="userName">Full name</label><input id="userName" autocomplete="name" placeholder="Your name" required>
+          <label for="userEmail">Email</label><input id="userEmail" type="email" autocomplete="email" placeholder="you@example.com" required>
+          <label for="userPassword">Password</label><input id="userPassword" type="password" autocomplete="current-password" minlength="4" placeholder="At least 4 characters" required>
+          <button class="button primary full" type="submit" id="authSubmit">Login to dashboard</button>
+        </form>
+        <p class="small-note">Demo only: this login is stored in your browser and is not secure authentication.</p>
+      </div>
+    </section>
+
+    <section id="appView" class="hidden">
+      <div class="dashboard-heading">
+        <div><div class="pill">MEDICINE COMPANION</div><h1>Hello, <span id="welcomeName">there</span> 👋</h1><p class="muted">A calmer way to keep track of your daily medicines.</p></div>
+        <div class="status-card"><span class="status-dot"></span><div><strong id="todayCount">0 medicines today</strong><small>Reminders saved on this device</small></div></div>
+      </div>
+
+      <div class="stats-grid">
+        <article class="stat"><span class="stat-icon blue">▦</span><div><small>Medicines</small><strong id="medicineCount">0</strong></div></article>
+        <article class="stat"><span class="stat-icon green">✓</span><div><small>Taken today</small><strong id="takenCount">0</strong></div></article>
+        <article class="stat"><span class="stat-icon orange">◷</span><div><small>Next reminder</small><strong id="nextReminder">Not scheduled</strong></div></article>
+      </div>
+
+      <div class="main-grid">
+        <section class="panel">
+          <div class="panel-heading"><div><h2>Add a medicine</h2><p class="muted">Enter the schedule exactly as prescribed.</p></div><span class="heading-icon">＋</span></div>
+          <form id="medicineForm" class="form-grid">
+            <div class="field full-span"><label for="medName">Medicine name *</label><input id="medName" required placeholder="e.g. Medicine name"></div>
+            <div class="field"><label for="medDose">Dosage / instructions</label><input id="medDose" placeholder="e.g. 1 tablet, after food"></div>
+            <div class="field"><label for="medTime">Reminder time *</label><input id="medTime" type="time" required></div>
+            <div class="field"><label for="medDays">Repeat</label><select id="medDays"><option value="daily">Every day</option><option value="once">One-time reminder</option></select></div>
+            <div class="field"><label for="medPhoto">Tablet photo</label><input id="medPhoto" type="file" accept="image/*"></div>
+            <div class="field full-span"><label for="medNotes">Notes (optional)</label><textarea id="medNotes" rows="2" placeholder="Any notes from your prescription"></textarea></div>
+            <button class="button primary full-span" type="submit">＋ Save medicine reminder</button>
+          </form>
+        </section>
+
+        <section class="panel">
+          <div class="panel-heading"><div><h2>Prescription & guardian</h2><p class="muted">Keep files and emergency contact details handy.</p></div><span class="heading-icon">♡</span></div>
+          <div class="upload-box"><div class="upload-symbol">▤</div><div><strong>Upload prescription</strong><p class="muted">Image or PDF · saved locally in this demo</p><input id="prescriptionFile" type="file" accept="image/*,.pdf"></div></div>
+          <div id="prescriptionList" class="file-list"><p class="muted small">No prescription uploaded yet.</p></div>
+          <div class="section-divider"></div>
+          <h3>Guardian contact</h3>
+          <p class="muted small">Used for the alert workflow if you don't confirm a reminder.</p>
+          <form id="guardianForm" class="guardian-form">
+            <div class="field"><label for="guardianName">Guardian name</label><input id="guardianName" placeholder="Parent / guardian"></div>
+            <div class="field"><label for="guardianPhone">Phone number</label><input id="guardianPhone" type="tel" placeholder="+91 98765 43210"></div>
+            <button class="button secondary full" type="submit">Save guardian details</button>
+          </form>
+          <div class="notice"><strong>Important:</strong> This browser-only demo cannot automatically place phone calls. A real deployment needs a secure backend and a calling/SMS provider integration.</div>
+        </section>
+      </div>
+
+      <section class="panel medicine-panel">
+        <div class="panel-heading"><div><h2>Your medicine schedule</h2><p class="muted">Your uploaded medicine photos appear with each reminder.</p></div><span class="count-badge" id="scheduleBadge">0 items</span></div>
+        <div id="medicineList" class="medicine-list"></div>
+        <div id="emptyState" class="empty-state"><div class="empty-illustration">✚</div><h3>No medicines added yet</h3><p>Add your first medicine above to start building your schedule.</p></div>
+      </section>
+    </section>
+  </main>
+
+  <div id="alarmModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="alarmTitle">
+    <div class="modal-card alarm-card">
+      <div class="alarm-pulse">🔔</div><div class="pill danger-pill">MEDICINE TIME</div>
+      <h2 id="alarmTitle">It's time for your medicine</h2>
+      <div id="alarmMedicine"></div>
+      <p id="alarmMessage" class="muted">Please confirm once you have taken your medicine.</p>
+      <button id="takenBtn" class="button primary full">I've taken it</button>
+      <button id="snoozeBtn" class="button secondary full">Remind me in 5 minutes</button>
+      <p class="small-note">If you don't respond, this demo will show an on-screen guardian alert. Real calls require a backend integration.</p>
+    </div>
+  </div>
+  <div id="guardianModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="guardianAlertTitle">
+    <div class="modal-card">
+      <div class="alert-symbol">☎</div><h2 id="guardianAlertTitle">Guardian alert triggered</h2>
+      <p id="guardianAlertText"></p>
+      <p class="muted small">Demo mode: no phone call or SMS was sent. Connect a backend calling provider to enable real alerts.</p>
+      <button id="closeGuardianBtn" class="button primary full">Okay</button>
+    </div>
+  </div>
+  <div id="toast" class="toast" role="status"></div>
+  <script src="script.js"></script>
+</body>
+</html>
